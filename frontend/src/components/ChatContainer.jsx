@@ -80,6 +80,11 @@ const ChatContainer = () => {
                 />
               )}
               {message.text && <p>{message.text}</p>}
+              {message.sentiment && (
+                <p className="text-sm mt-1 italic opacity-70">
+                  Sentiment: {message.sentiment.charAt(0).toUpperCase() + message.sentiment.slice(1)}
+                </p>
+              )}
             </div>
           </div>
         ))}

@@ -3,6 +3,9 @@ import Message from "../models/message.model.js";
 
 import cloudinary from "../lib/cloudinary.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
+import Sentiment from "sentiment";
+
+const sentimentAnalyzer = new Sentiment();
 
 export const getUsersForSidebar = async (req, res) => {
   try {
@@ -48,11 +51,23 @@ export const sendMessage = async (req, res) => {
       imageUrl = uploadResponse.secure_url;
     }
 
+    // Analyze sentiment of the text
+    let sentimentResult = "neutral";
+    if (text && text.trim().length > 0) {
+      const analysis = sentimentAnalyzer.analyze(text);
+      if (analysis.score > 0) {
+        sentimentResult = "positive";
+      } else if (analysis.score < 0) {
+        sentimentResult = "negative";
+      }
+    }
+
     const newMessage = new Message({
       senderId,
       receiverId,
       text,
       image: imageUrl,
+      sentiment: sentimentResult,
     });
 
     await newMessage.save();
